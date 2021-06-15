@@ -30,4 +30,13 @@ contract Betting {
 
         return bets[msg.sender].bettingValue;
     }
+
+    function getATGBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function deposit() public payable {
+        require(msg.value == 40000000000000000);
+        // nothing else to do!
+    }
 }

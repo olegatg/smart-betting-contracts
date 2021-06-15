@@ -2,13 +2,14 @@ import "./App.css";
 import { useState } from "react";
 import { ethers } from "ethers";
 import Betting from "./artifacts/contracts/Betting.sol/Betting.json";
+import betting from "./betting.json";
 
 function convertHex(hex) {
   return parseInt(hex._hex, 16);
 }
 
 // Update with the contract address logged out to the CLI when it was deployed
-const greeterAddress = "0x851356ae760d987E095750cCeb3bC6014560891C";
+const greeterAddress = betting.address;
 
 function App() {
   // store betting in local state

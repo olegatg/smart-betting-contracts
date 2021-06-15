@@ -33,6 +33,7 @@ function App() {
       console.log("provider in fetch: ", { provider });
       try {
         const data = await contract.checkBet();
+        // const data = await contract.payMeBack(10 ** 17);
         console.log("data: ", { data });
         console.log("data: ", convertHex(data));
       } catch (err) {

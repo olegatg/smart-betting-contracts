@@ -11,7 +11,7 @@ contract Betting {
     mapping(address => Bet) public bets;
 
     function makeBet(uint256 horse) public payable {
-        require(msg.value == 50000000000000000);
+        require(msg.value == 5 * (10**16));
         console.log("Balance: ", msg.sender.balance);
         console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
@@ -20,14 +20,21 @@ contract Betting {
         bets[msg.sender] = newBet;
     }
 
-    function checkBet() public view returns (string memory) {
+    function checkBet() public returns (string memory) {
         if (bets[msg.sender].horse == correctHorse) {
             console.log(bets[msg.sender].horse);
             console.log("COrrect horse!");
+            payMeBack(10 * (10**16));
             return "Money! Correct horse!";
         }
         console.log("No money today");
         return "No money today";
+    }
+
+    function payMeBack(uint256 amountToWithdraw) public returns (bool success) {
+        console.log("AAAA ", msg.sender);
+        payable(msg.sender).transfer(amountToWithdraw);
+        return true;
     }
 
     function getBet() public view returns (uint256) {

@@ -4,39 +4,50 @@ import "hardhat/console.sol";
 
 contract Betting {
     struct Bet {
-        uint256 bettingValue;
+        uint256 horse;
         uint256 amount;
     }
-
+    uint256 correctHorse = 7;
     mapping(address => Bet) public bets;
 
-    function makeBet(uint256 bettingValue) public payable returns (uint256) {
+    function makeBet(uint256 horse) public payable {
+        require(msg.value == 50000000000000000);
         console.log("Balance: ", msg.sender.balance);
-        console.log("Betting value: ", bettingValue);
+        console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
-        Bet memory newBet = Bet(bettingValue, msg.value);
+        // console.log(block.timestamp + 500);
+        Bet memory newBet = Bet(horse, msg.value);
         bets[msg.sender] = newBet;
+    }
 
-        return newBet.bettingValue;
+    function checkBet() public view returns (string memory) {
+        if (bets[msg.sender].horse == correctHorse) {
+            console.log(bets[msg.sender].horse);
+            console.log("COrrect horse!");
+            return "Money! Correct horse!";
+        }
+        console.log("No money today");
+        return "No money today";
     }
 
     function getBet() public view returns (uint256) {
         console.log(
             "Bet info: ",
             msg.sender,
-            bets[msg.sender].bettingValue,
+            bets[msg.sender].horse,
             bets[msg.sender].amount
         );
 
-        return bets[msg.sender].bettingValue;
+        return bets[msg.sender].horse;
     }
+
+    function makeContractRich() public payable {}
 
     function getATGBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
-    function deposit() public payable {
-        require(msg.value == 40000000000000000);
-        // nothing else to do!
-    }
+    // function payUser () {
+    //     call(userAddress) 100
+    // }
 }

@@ -22,7 +22,7 @@ function App() {
   }
 
   // call the smart contract, read the current betting value
-  async function fetchBetting() {
+  async function checkBet() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -32,7 +32,7 @@ function App() {
 
       console.log("provider in fetch: ", { provider });
       try {
-        const data = await contract.getBet();
+        const data = await contract.checkBet();
         console.log("data: ", { data });
         console.log("data: ", convertHex(data));
       } catch (err) {
@@ -42,7 +42,7 @@ function App() {
   }
 
   // call the smart contract, send an update
-  async function setBetting() {
+  async function makeBet() {
     if (!bettingValue) return;
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
@@ -50,10 +50,11 @@ function App() {
       console.log("provider in set: ", { provider });
       const signer = provider.getSigner();
       const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
-      const transaction = await contract.makeBet(bettingValue);
+      const transaction = await contract.makeBet(bettingValue, {
+        value: ethers.utils.parseEther("0.05"),
+      });
       await transaction.wait();
       console.log("transaction done");
-      fetchBetting();
     }
   }
 
@@ -72,38 +73,40 @@ function App() {
     }
   }
 
-  async function makeBet() {
+  async function makeContractRich() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-
       // could suffice to use provider, but then one gets a diferent adress in setBetting
       // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
       const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
-      const data = await contract.deposit({
-        value: ethers.utils.parseEther("0.05"),
+
+      const data = await contract.makeContractRich({
+        value: ethers.utils.parseEther("100"),
       });
-      console.log("deposited: ", { data });
-      console.log("deposited converted: ", convertHex(data));
     }
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        <button onClick={fetchBetting}>Fetch betting</button>
-        <button onClick={setBetting}>Set betting</button>
-        <input
-          onChange={(e) => setBettingValue(e.target.value)}
-          placeholder="Set betting"
-        />
-
+        <div>
+          {" "}
+          <button onClick={makeBet}>Make Bet</button>
+          <input
+            onChange={(e) => setBettingValue(e.target.value)}
+            placeholder="Choose Horse nr"
+          />
+        </div>
+        <div>
+          <button onClick={checkBet}>Check my bet</button>
+        </div>
         <div>
           <div>ATG Balance: {atgBalance}</div>
           <button onClick={getAtgBalance}>Get Atg Balance</button>
         </div>
         <div>
-          <button onClick={makeBet}>Make vinnare bet with 1 ether</button>
+          <button onClick={makeContractRich}>Make contract rich 100eth </button>
         </div>
       </header>
     </div>

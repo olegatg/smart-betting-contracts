@@ -8,7 +8,7 @@ function logHex(hex) {
 }
 
 // Update with the contract address logged out to the CLI when it was deployed
-const greeterAddress = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
+const greeterAddress = "0x0B306BF915C4d645ff596e518fAf3F9669b97016";
 
 function App() {
   // store betting in local state
@@ -23,13 +23,15 @@ function App() {
   async function fetchBetting() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contract = new ethers.Contract(
-        greeterAddress,
-        Betting.abi,
-        provider
-      );
+      const signer = provider.getSigner();
+      // could suffice to use provider, but then one gets a diferent adress in setBetting
+      // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
+      const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
+
+      console.log("provider in fetch: ", { provider });
       try {
         const data = await contract.getBet();
+        console.log("data: ", { data });
         console.log("data: ", logHex(data));
       } catch (err) {
         console.log("Error: ", err);
@@ -43,6 +45,7 @@ function App() {
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log("provider in set: ", { provider });
       const signer = provider.getSigner();
       const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
       const transaction = await contract.makeBet(bettingValue);

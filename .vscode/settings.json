@@ -1,9 +1,4 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#5C0736",
-        "titleBar.activeBackground": "#810A4B",
-        "titleBar.activeForeground": "#FFFBFD"
-    },
     "spellright.language": [
         "sv"
     ],

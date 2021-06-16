@@ -41,6 +41,16 @@ async function main() {
       }
     }
   );
+
+  fs.writeFileSync(
+    "./server/betting.json",
+    JSON.stringify({ address: betting.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

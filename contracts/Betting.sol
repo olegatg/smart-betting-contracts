@@ -4,15 +4,19 @@ import "hardhat/console.sol";
 
 contract Betting {
     struct Bet {
-        uint256 horse;
+        uint8 horse;
         uint256 amount;
     }
-    uint256 correctHorse = 7;
+
+    uint8 correctHorse = 7;
     mapping(address => Bet) public bets;
+    mapping(uint8 => address) public addresses;
 
-    event FetchCorrectHorse(address id);
+    event FetchCorrectHorse(uint8 id, address adr);
 
-    function makeBet(uint256 horse) public payable {
+    uint8 currentId = 0;
+
+    function makeBet(uint8 horse) public payable {
         require(msg.value == 5 * (10**16));
         console.log("Balance: ", msg.sender.balance);
         console.log("Horse: ", horse);
@@ -20,6 +24,8 @@ contract Betting {
         // console.log(block.timestamp + 500);
         Bet memory newBet = Bet(horse, msg.value);
         bets[msg.sender] = newBet;
+        addresses[currentId] = msg.sender;
+
         // save address;
 
         // race - off-chain
@@ -28,7 +34,9 @@ contract Betting {
         // 1. placeBet(betId) -> checkBet(betId) -> getCorrectHorse(betId) -> ... wait for 1 week (server saves betIds) -> oracleNotifiesCorrectHorse(betId) -> checkBet() continues to pay you.
         // 2.
 
-        emit FetchCorrectHorse(msg.sender);
+        emit FetchCorrectHorse(currentId, msg.sender);
+
+        currentId++;
     }
 
     function checkBet() public returns (string memory) {
@@ -48,13 +56,16 @@ contract Betting {
         return true;
     }
 
-    function finishRaceAndPay(uint256 correctHorse, address adr)
+    function finishRaceAndPay(uint8 horse, uint8 id)
         public
+        view
         returns (bool)
     {
+        console.log("Pay back to the following bet:");
         console.log(correctHorse);
-        console.log(bets[adr].horse);
-        console.log(adr);
+        console.log(id);
+        console.log(bets[addresses[id]].horse);
+        return true;
     }
 
     function getBet() public view returns (uint256) {

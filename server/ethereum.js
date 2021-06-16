@@ -8,11 +8,15 @@ const web3 = new Web3(new Web3.providers.HttpProvider(networkAddress));
 console.log(web3.eth.contract);
 const contract = web3.eth.contract(artifact.abi).at(contractAddress);
 
-const account = () => {
+const account = (adr) => {
   return new Promise((resolve, reject) => {
     web3.eth.getAccounts((err, accounts) => {
+      console.log("accounts: ", accounts);
+      console.log("contractAddress", contractAddress);
+      console.log("adr", adr);
       if (err === null) {
-        resolve(accounts[process.env.ACCOUNT_NUMBER]);
+        //resolve(accounts[process.env.ACCOUNT_NUMBER]);
+        resolve(adr);
       } else {
         reject(err);
       }
@@ -46,13 +50,13 @@ const createRequest = ({ urlToQuery, attributeToFetch }) => {
 };
 
 /* oracle service/betting service uses this to send data to contract */
-const sendCorrectHorse = (correctHorse, betAddress) => {
+const sendCorrectHorse = (correctHorse, id, adr) => {
   return new Promise((resolve, reject) => {
-    account()
+    account(adr)
       .then((account) => {
         contract.finishRaceAndPay(
           correctHorse,
-          betAddress,
+          id,
           {
             from: account,
             gas: 60000000,

@@ -11,11 +11,13 @@ const contract = web3.eth.contract(artifact.abi).at(contractAddress);
 const account = (adr) => {
   return new Promise((resolve, reject) => {
     web3.eth.getAccounts((err, accounts) => {
+      // if we had a private key of "atg" account, we could pay
+
       console.log("accounts: ", accounts);
       console.log("contractAddress", contractAddress);
       console.log("adr", adr);
       if (err === null) {
-        //resolve(accounts[process.env.ACCOUNT_NUMBER]);
+        // resolve(accounts[process.env.ACCOUNT_NUMBER]);
         resolve(adr);
       } else {
         reject(err);

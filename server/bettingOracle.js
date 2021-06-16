@@ -16,7 +16,7 @@ const start = () => {
     bets.push({ id: result.args.id, address: result.args.adr });
 
     setTimeout(() => {
-      const correctHorse = 7;
+      const correctHorse = 9;
       console.log("Now race has finished and correct horse is: ", correctHorse);
       onFinishedRace(correctHorse);
     }, 5000);

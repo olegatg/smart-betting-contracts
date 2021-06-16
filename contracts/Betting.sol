@@ -34,10 +34,24 @@ contract Betting {
         // 1. placeBet(betId) -> checkBet(betId) -> getCorrectHorse(betId) -> ... wait for 1 week (server saves betIds) -> oracleNotifiesCorrectHorse(betId) -> checkBet() continues to pay you.
         // 2.
 
-        emit FetchCorrectHorse(currentId, msg.sender);
+        // emit FetchCorrectHorse(currentId, msg.sender);
+
+        // still do payment ???
+
+        // await... for oracle response?
 
         currentId++;
     }
+
+    /*
+
+        if you press directly you get "race not finished"
+        wait 30 sec.
+
+        press the button -> getPayment contract -> race is finished -> how do I get correct horse from node -> pay
+        you get money.
+
+    */
 
     function checkBet() public returns (string memory) {
         if (bets[msg.sender].horse == correctHorse) {
@@ -56,16 +70,28 @@ contract Betting {
         return true;
     }
 
-    function finishRaceAndPay(uint8 horse, uint8 id)
+    function payMeBackWithAddress(uint256 amountToWithdraw, address addr)
         public
-        view
-        returns (bool)
+        returns (bool success)
     {
+        payable(addr).transfer(amountToWithdraw);
+        return true;
+    }
+
+    function finishRaceAndPay(uint8 horse, uint8 id) public returns (bool) {
         console.log("Pay back to the following bet:");
-        console.log(correctHorse);
+        console.log(horse);
         console.log(id);
         console.log(bets[addresses[id]].horse);
-        return true;
+
+        correctHorse = horse;
+
+        if (horse == bets[addresses[id]].horse) {
+            // payable(addresses[id]).transfer(10 * (10**16));
+            // payMeBackWithAddress(10 * (10**16), addresses[id]);
+            return true;
+        }
+        return false;
     }
 
     function getBet() public view returns (uint256) {

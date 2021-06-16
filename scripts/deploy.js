@@ -26,6 +26,7 @@ async function main() {
   const betting = await Betting.deploy();
 
   await betting.deployed();
+  console.log({ betting });
 
   console.log(
     "Betting deployed to:",

@@ -1,10 +1,13 @@
 const { checkResultErrors } = require("ethers/lib/utils");
-const { sendCorrectHorse, onFetchCorrectHorse } = require("./ethereum.js");
+const {
+  sendCorrectHorse,
+  subscribeToGetCorrectHorseEvent,
+} = require("./ethereum.js");
 
 const bets = [];
 
 const start = () => {
-  onFetchCorrectHorse((error, result) => {
+  subscribeToGetCorrectHorseEvent((error, result) => {
     console.log("result", result);
     console.log("start", result?.args);
 
@@ -13,7 +16,7 @@ const start = () => {
     }
 
     // save the incoming bets
-    bets.push({ id: result.args.id, address: result.args.adr });
+    bets.push({ id: result.args.id, callerAddress: result.args.callerAddress });
 
     setTimeout(() => {
       const correctHorse = 9;
@@ -33,10 +36,11 @@ const start = () => {
 
     // in real life we would map as in alternative above
     if (bets.length > 0) {
+      console.log("callerAddress: ", bets[bets.length - 1].callerAddress);
       sendCorrectHorse(
         correctHorse,
         bets[bets.length - 1].id,
-        bets[bets.length - 1].adr
+        bets[bets.length - 1].callerAddress
       );
     }
   };

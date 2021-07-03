@@ -1,4 +1,4 @@
-const bettingOracle = require("./bettingOracle");
+const bettingOracleService = require("./bettingOracleService");
 
-bettingOracle();
+bettingOracleService();
 console.log("asd");

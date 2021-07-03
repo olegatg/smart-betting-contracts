@@ -15,18 +15,11 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
 
   const Betting = await hre.ethers.getContractFactory("Betting");
   const betting = await Betting.deploy();
 
   await betting.deployed();
-  console.log({ betting });
 
   console.log(
     "Betting deployed to:",
@@ -34,7 +27,7 @@ async function main() {
   );
 
   fs.writeFileSync(
-    "./src/betting.json",
+    "./src/bettingAddress.json",
     JSON.stringify({ address: betting.address }),
     function (err) {
       if (err) {
@@ -43,9 +36,31 @@ async function main() {
     }
   );
 
+  const BettingOracleFactory = await hre.ethers.getContractFactory(
+    "BettingOracle"
+  );
+  const bettingOracle = await BettingOracleFactory.deploy();
+
+  await bettingOracle.deployed();
+
+  console.log(
+    "Betting oracle deployed to:",
+    JSON.stringify({ address: bettingOracle.address })
+  );
+
   fs.writeFileSync(
-    "./server/betting.json",
-    JSON.stringify({ address: betting.address }),
+    "./server/bettingOracleAddress.json",
+    JSON.stringify({ address: bettingOracle.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  fs.writeFileSync(
+    "./src/bettingOracleAddress.json",
+    JSON.stringify({ address: bettingOracle.address }),
     function (err) {
       if (err) {
         console.log(err);

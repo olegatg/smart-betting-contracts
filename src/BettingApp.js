@@ -1,15 +1,17 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Betting from "./artifacts/contracts/Betting.sol/Betting.json";
-import betting from "./betting.json";
+import bettingAddress from "./bettingAddress.json";
+import bettingOracleAddress from "./bettingOracleAddress.json";
 
 function convertHex(hex) {
   return parseInt(hex._hex, 16);
 }
 
 // Update with the contract address logged out to the CLI when it was deployed
-const greeterAddress = betting.address;
+const bettingContractAddress = bettingAddress.address;
+const oracleAddress = bettingOracleAddress.address;
 
 function App() {
   // store betting in local state
@@ -28,7 +30,11 @@ function App() {
       const signer = provider.getSigner();
       // could suffice to use provider, but then one gets a diferent adress in setBetting
       // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
-      const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
 
       console.log("provider in fetch: ", { provider });
       try {
@@ -50,7 +56,12 @@ function App() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log("provider in set: ", { provider });
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
+
       const transaction = await contract.makeBet(bettingValue, {
         value: ethers.utils.parseEther("0.05"),
       });
@@ -59,13 +70,44 @@ function App() {
     }
   }
 
+  // tmp: this needs to be done from the oracle owner account
+  async function setOracleAddress() {
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log("provider in set: ", { provider });
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
+
+      console.log("will set oracle address to ", oracleAddress);
+      const oracleInstanceTransaction = await contract.setOracleInstanceAddress(
+        oracleAddress
+      );
+      await oracleInstanceTransaction.wait();
+
+      console.log("transaction done");
+    }
+  }
+
+  useEffect(() => {
+    setOracleAddress();
+  }, []);
+
   async function getAtgBalance() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       // could suffice to use provider, but then one gets a diferent adress in setBetting
       // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
-      const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
 
       const data = await contract.getATGBalance();
       console.log("atg balance: ", { data });
@@ -80,7 +122,11 @@ function App() {
       const signer = provider.getSigner();
       // could suffice to use provider, but then one gets a diferent adress in setBetting
       // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
-      const contract = new ethers.Contract(greeterAddress, Betting.abi, signer);
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
 
       const data = await contract.makeContractRich({
         value: ethers.utils.parseEther("100"),
@@ -108,6 +154,9 @@ function App() {
         </div>
         <div>
           <button onClick={makeContractRich}>Make contract rich 100eth </button>
+        </div>
+        <div>
+          <button onClick={setOracleAddress}>Set oracle address</button>
         </div>
       </header>
     </div>

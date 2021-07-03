@@ -1,24 +1,24 @@
 const Web3 = require("web3");
 
-const artifact = require("../src/artifacts/contracts/Betting.sol/Betting.json");
-const contractAddress = require("./betting.json").address;
+const artifact = require("../src/artifacts/contracts/BettingOracle.sol/BettingOracle.json");
+const contractAddress = require("./bettingOracleAddress.json").address;
 console.log({ contractAddress });
 const networkAddress = "http://localhost:8545";
 const web3 = new Web3(new Web3.providers.HttpProvider(networkAddress));
 console.log(web3.eth.contract);
 const contract = web3.eth.contract(artifact.abi).at(contractAddress);
 
-const account = (adr) => {
+const account = (address) => {
   return new Promise((resolve, reject) => {
     web3.eth.getAccounts((err, accounts) => {
       // if we had a private key of "atg" account, we could pay
 
       console.log("accounts: ", accounts);
       console.log("contractAddress", contractAddress);
-      console.log("adr", adr);
+      console.log("adr", address);
       if (err === null) {
         // resolve(accounts[process.env.ACCOUNT_NUMBER]);
-        resolve(adr);
+        resolve(address);
       } else {
         reject(err);
       }
@@ -52,16 +52,18 @@ const createRequest = ({ urlToQuery, attributeToFetch }) => {
 };
 
 /* oracle service/betting service uses this to send data to contract */
-const sendCorrectHorse = (correctHorse, id, adr) => {
+const sendCorrectHorse = (correctHorse, id, address) => {
+  console.log("send corr horse: ", { correctHorse, id, address });
   return new Promise((resolve, reject) => {
-    account(adr)
+    account(address)
       .then((account) => {
-        contract.finishRaceAndPay(
+        contract.sendCorrectHorse(
           correctHorse,
+          address,
           id,
           {
             from: account,
-            gas: 60000000,
+            gas: 12450000, // max gas.
           },
           (err, res) => {
             if (err === null) {
@@ -69,7 +71,6 @@ const sendCorrectHorse = (correctHorse, id, adr) => {
               resolve(res);
             } else {
               console.log({ err });
-
               reject(err);
             }
           }
@@ -80,12 +81,12 @@ const sendCorrectHorse = (correctHorse, id, adr) => {
 };
 
 /* listener for NewRequest event - oracle service uses it and does staff when receives it */
-const onFetchCorrectHorse = (callback) => {
-  contract.FetchCorrectHorse((error, result) => callback(error, result));
+const subscribeToGetCorrectHorseEvent = (callback) => {
+  contract.GetCorrectHorseEvent((error, result) => callback(error, result));
 };
 
 module.exports = {
   createRequest,
   sendCorrectHorse,
-  onFetchCorrectHorse,
+  subscribeToGetCorrectHorseEvent,
 };

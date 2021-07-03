@@ -2,45 +2,80 @@ pragma solidity ^0.8.5;
 
 import "hardhat/console.sol";
 
+import "./HorseOracleInterface.sol";
+
+// import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 contract Betting {
     struct Bet {
         uint8 horse;
         uint256 amount;
     }
 
-    uint8 correctHorse = 7;
-    mapping(address => Bet) public bets;
-    mapping(uint8 => address) public addresses;
+    uint8 private correctHorse;
+    HorseOracleInterface private oracleInstance;
+    address private oracleAddress;
+    mapping(uint256 => bool) myRequests;
+    event NewOracleAddressEvent(address oracleAddress);
+    event ReceivedNewRequestIdEvent(uint256 id);
+    event ReceivedCorrectHorseEvent(uint256 horseNumber, uint256 id);
+
+    mapping(uint256 => Bet) public bets;
+    mapping(uint256 => address) public addresses;
 
     event FetchCorrectHorse(uint8 id, address adr);
 
-    uint8 currentId = 0;
+    /*
+     * need to set this first from the oracle account
+     */
+    function setOracleInstanceAddress(address _oracleInstanceAddress)
+        public
+    //   onlyOwner
+    {
+        oracleAddress = _oracleInstanceAddress;
+        oracleInstance = HorseOracleInterface(oracleAddress);
+        emit NewOracleAddressEvent(oracleAddress);
+    }
+
+    function oracleCallback(uint8 _horseNumber, uint256 _id) public onlyOracle {
+        console.log("Oracle callback executed");
+        require(myRequests[_id], "This request is not in my pending list.");
+        correctHorse = _horseNumber;
+        delete myRequests[_id];
+        emit ReceivedCorrectHorseEvent(_horseNumber, _id);
+
+        if (bets[_id].horse == correctHorse) {
+            console.log(bets[_id].horse);
+            console.log("Correct horse!");
+            payMeBack(10 * (10**16), addresses[_id]);
+        }
+        console.log("No money today");
+    }
+
+    modifier onlyOracle() {
+        require(
+            msg.sender == oracleAddress,
+            "You are not authorized to call this function."
+        );
+        _;
+    }
 
     function makeBet(uint8 horse) public payable {
         require(msg.value == 5 * (10**16));
         console.log("Balance: ", msg.sender.balance);
         console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
+
         // console.log(block.timestamp + 500);
+
         Bet memory newBet = Bet(horse, msg.value);
-        bets[msg.sender] = newBet;
-        addresses[currentId] = msg.sender;
 
-        // save address;
+        // bet is made. now request correct horse. oracle will call callback.
+        uint256 id = oracleInstance.getCorrectHorse(msg.sender);
+        myRequests[id] = true;
 
-        // race - off-chain
-        // server on race finish: sendCorrectHorseOracleFnc(); -> payEveryone(addresses);
-
-        // 1. placeBet(betId) -> checkBet(betId) -> getCorrectHorse(betId) -> ... wait for 1 week (server saves betIds) -> oracleNotifiesCorrectHorse(betId) -> checkBet() continues to pay you.
-        // 2.
-
-        // emit FetchCorrectHorse(currentId, msg.sender);
-
-        // still do payment ???
-
-        // await... for oracle response?
-
-        currentId++;
+        bets[id] = newBet;
+        addresses[id] = msg.sender;
     }
 
     /*
@@ -53,6 +88,7 @@ contract Betting {
 
     */
 
+    /*
     function checkBet() public returns (string memory) {
         if (bets[msg.sender].horse == correctHorse) {
             console.log(bets[msg.sender].horse);
@@ -63,14 +99,17 @@ contract Betting {
         console.log("No money today");
         return "No money today";
     }
+    */
 
+    /*
     function payMeBack(uint256 amountToWithdraw) public returns (bool success) {
         console.log("AAAA ", msg.sender);
         payable(msg.sender).transfer(amountToWithdraw);
         return true;
     }
+    */
 
-    function payMeBackWithAddress(uint256 amountToWithdraw, address addr)
+    function payMeBack(uint256 amountToWithdraw, address addr)
         public
         returns (bool success)
     {
@@ -78,6 +117,7 @@ contract Betting {
         return true;
     }
 
+    /*
     function finishRaceAndPay(uint8 horse, uint8 id) public returns (bool) {
         console.log("Pay back to the following bet:");
         console.log(horse);
@@ -93,19 +133,7 @@ contract Betting {
         }
         return false;
     }
-
-    function getBet() public view returns (uint256) {
-        console.log(
-            "Bet info: ",
-            msg.sender,
-            bets[msg.sender].horse,
-            bets[msg.sender].amount
-        );
-
-        return bets[msg.sender].horse;
-    }
-
-    function makeContractRich() public payable {}
+    */
 
     function getATGBalance() public view returns (uint256) {
         return address(this).balance;

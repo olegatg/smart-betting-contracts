@@ -40,7 +40,11 @@ contract Betting {
     /*
      * Called by an oracle service, potentially after a long time?
      */
-    function oracleCallback(uint8 _horseNumber, uint256 _id) public onlyOracle {
+    function oracleCallback(uint8 _horseNumber, uint256 _id)
+        public
+        payable
+        onlyOracle
+    {
         console.log("Oracle callback executed");
         require(myRequests[_id], "This request is not in my pending list.");
         correctHorse = _horseNumber;

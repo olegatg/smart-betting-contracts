@@ -6,19 +6,20 @@ const {
 
 const bets = [];
 
-const start = () => {
+const start = async () => {
   console.log("started. will subscribe to GetCorrectHorseEvent");
   /*
    * subscribe and listen to the users requesting results
    */
   subscribeToGetCorrectHorseEvent(
     // function executed at the request:
-    (error, result) => {
-      console.log("LISTENER got GetCorrectHorseEvent! result: ", result);
-      console.log("LISTENER! args: ", result.args);
-      console.log("LISTENER! args Id: ", result.args.id.toNumber());
+    (error, event) => {
+      console.log("LISTENER got GetCorrectHorseEvent! event: ", {
+        event,
+        error,
+      });
 
-      if (!result) {
+      if (!event) {
         return;
       }
 
@@ -27,9 +28,9 @@ const start = () => {
       console.log("LISTENER! will push caller to our array");
       // save the incoming bets
       bets.push({
-        id: result.args.id,
-        callerAddress: result.args.callerAddress,
-          msgSenderAddress: result.args.msgSenderAddress
+        id: event.returnValues.id,
+        callerAddress: event.returnValues.callerAddress,
+        msgSenderAddress: event.returnValues.msgSenderAddress,
       });
 
       setTimeout(() => {
@@ -56,12 +57,16 @@ const start = () => {
     // in real life we would map as in alternative above
     if (bets.length > 0) {
       console.log("callerAddress: ", bets[bets.length - 1].callerAddress);
-      sendCorrectHorse(
-        correctHorse,
-        bets[bets.length - 1].id,
-        bets[bets.length - 1].callerAddress,
-        bets[bets.length - 1].msgSenderAddress
-      );
+      try {
+        sendCorrectHorse(
+          correctHorse,
+          bets[bets.length - 1].id,
+          bets[bets.length - 1].callerAddress,
+          bets[bets.length - 1].msgSenderAddress
+        );
+      } catch (error) {
+        console.log("ERROR sending: ", error);
+      }
     }
   };
 };

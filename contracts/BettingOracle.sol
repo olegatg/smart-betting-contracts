@@ -8,7 +8,11 @@ contract BettingOracle {
     uint256 private randNonce = 0;
     uint256 private modulus = 1000;
     mapping(uint256 => bool) pendingRequests;
-    event GetCorrectHorseEvent(address callerAddress, uint256 id, address msgSenderAddress);
+    event GetCorrectHorseEvent(
+        address callerAddress,
+        uint256 id,
+        address msgSenderAddress
+    );
     event SetCorrectHorseEvent(uint256 ethPrice, address callerAddress);
 
     /*
@@ -42,7 +46,7 @@ contract BettingOracle {
         address _callerAddress,
         uint256 _id
     ) public payable {
-        console.log("ORACLE: sendCorrectHorse: ", correctHorse);
+        console.log("ORACLE FNC: sendCorrectHorse: ", correctHorse);
         require(
             pendingRequests[_id],
             "This request is not in my pending list."

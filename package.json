@@ -8,6 +8,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@truffle/hdwallet-provider": "^1.5.0",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.3.1",
@@ -16,9 +17,8 @@
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
     "request-promise-native": "^1.0.9",
-    "truffle-hdwallet-provider": "^0.0.5",
     "web-vitals": "^1.0.1",
-    "web3": "^0.20.6"
+    "web3": "^1.5.2"
   },
   "scripts": {
     "start": "react-scripts start",

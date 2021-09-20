@@ -15,7 +15,8 @@ const start = () => {
     // function executed at the request:
     (error, result) => {
       console.log("LISTENER got GetCorrectHorseEvent! result: ", result);
-      console.log("LISTENER! args: ", result?.args);
+      console.log("LISTENER! args: ", result.args);
+      console.log("LISTENER! args Id: ", result.args.id.toNumber());
 
       if (!result) {
         return;
@@ -24,11 +25,11 @@ const start = () => {
       // implement your log - add request to your log.
 
       console.log("LISTENER! will push caller to our array");
-
       // save the incoming bets
       bets.push({
         id: result.args.id,
         callerAddress: result.args.callerAddress,
+          msgSenderAddress: result.args.msgSenderAddress
       });
 
       setTimeout(() => {
@@ -58,7 +59,8 @@ const start = () => {
       sendCorrectHorse(
         correctHorse,
         bets[bets.length - 1].id,
-        bets[bets.length - 1].callerAddress
+        bets[bets.length - 1].callerAddress,
+        bets[bets.length - 1].msgSenderAddress
       );
     }
   };

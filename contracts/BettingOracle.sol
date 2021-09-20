@@ -8,7 +8,7 @@ contract BettingOracle {
     uint256 private randNonce = 0;
     uint256 private modulus = 1000;
     mapping(uint256 => bool) pendingRequests;
-    event GetCorrectHorseEvent(address callerAddress, uint256 id);
+    event GetCorrectHorseEvent(address callerAddress, uint256 id, address msgSenderAddress);
     event SetCorrectHorseEvent(uint256 ethPrice, address callerAddress);
 
     /*
@@ -32,7 +32,7 @@ contract BettingOracle {
         ) % modulus;
         pendingRequests[id] = true;
         // emit an event to notify external service
-        emit GetCorrectHorseEvent(callerAddress, id);
+        emit GetCorrectHorseEvent(callerAddress, id, msg.sender);
         return id;
     }
 
@@ -41,7 +41,7 @@ contract BettingOracle {
         uint8 correctHorse,
         address _callerAddress,
         uint256 _id
-    ) public {
+    ) public payable {
         console.log("ORACLE: sendCorrectHorse: ", correctHorse);
         require(
             pendingRequests[_id],

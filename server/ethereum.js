@@ -1,4 +1,6 @@
 const Web3 = require("web3");
+const HDWalletProvider = require("truffle-hdwallet-provider");
+
 
 const artifact = require("../src/artifacts/contracts/BettingOracle.sol/BettingOracle.json");
 const contractAddress = require("./bettingOracleAddress.json").address;
@@ -6,7 +8,9 @@ console.log({ contractAddress });
 const bettingContractAddress = require("./bettingAddress.json").address;
 console.log({ bettingContractAddress });
 const networkAddress = "http://localhost:8545";
-const web3 = new Web3(new Web3.providers.HttpProvider(networkAddress));
+const web3 = new Web3(new HDWalletProvider("spell coast torch proof roof basket lift rural figure pigeon coffee slender",
+ "http://localhost:8545"
+));
 console.log(web3.eth.contract);
 const contract = web3.eth.contract(artifact.abi).at(contractAddress);
 
@@ -54,18 +58,20 @@ const createRequest = ({ urlToQuery, attributeToFetch }) => {
 };
 
 /* oracle service/betting service uses this to send data to contract */
-const sendCorrectHorse = (correctHorse, id, address) => {
-  console.log("send corr horse: ", { correctHorse, id, address });
+const sendCorrectHorse = (correctHorse, id, betPlayerAddress, msgSenderAddress) => {
+  console.log("send corr horse: ", { correctHorse, id, betPlayerAddress });
   return new Promise((resolve, reject) => {
-    account(address)
+    account(betPlayerAddress)
       .then((account) => {
+        console.log("Inside sendCorrectHorse : betPlayerAddress ", betPlayerAddress);
+        console.log("Inside sendCorrectHorse : msgSenderAddress ", msgSenderAddress);
+        console.log("Inside sendCorrectHorse : account ", account);
         console.log("THIS WILL CALL OUR CONTRACT/ORACLE callback");
         contract.sendCorrectHorse(
-          correctHorse,
-          address,
+          correctHorse, betPlayerAddress,
           id,
           {
-            from: bettingContractAddress, // what should this be? should this be user who made the bet?     or is it "oracle owner account?"
+            from: account, // what should this be? should this be user who made the bet?     or is it "oracle owner account?"
             gas: 12450000, // max gas. // who pays this?
           },
           (err, res) => {

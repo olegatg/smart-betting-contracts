@@ -8,7 +8,7 @@ console.log({ contractAddress });
 const bettingContractAddress = require("./bettingAddress.json").address;
 console.log({ bettingContractAddress });
 const networkAddress = "http://localhost:8545";
-const web3 = new Web3(new HDWalletProvider("spell coast torch proof roof basket lift rural figure pigeon coffee slender",
+const web3 = new Web3(new HDWalletProvider("11111 22222 33333 44444 55555 66666 77777 88888 99999 000000 coffee slender",
  "http://localhost:8545"
 ));
 console.log(web3.eth.contract);

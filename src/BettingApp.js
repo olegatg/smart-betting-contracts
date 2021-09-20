@@ -52,25 +52,31 @@ function App() {
   async function makeBet() {
     if (!bettingValue) return;
     if (typeof window.ethereum !== "undefined") {
-      await requestAccount();
+      console.log("will request account");
+      const account = await requestAccount();
+      console.log("got account ", { account });
+      console.log("will create provider");
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log("provider in set: ", { provider });
       const signer = provider.getSigner();
+      console.log("got signer: ", { provider });
       const contract = new ethers.Contract(
         bettingContractAddress,
         Betting.abi,
         signer
       );
+      console.log("got contract: ", { contract });
 
       const transaction = await contract.makeBet(bettingValue, {
         value: ethers.utils.parseEther("0.05"),
       });
+      console.log("await for transaction ", { transaction });
       await transaction.wait();
       console.log("transaction done");
     }
   }
 
-  // tmp: this needs to be done from the oracle owner account
+  // tmp: this needs to be done from the oracle owner account - figure out.
   async function setOracleAddress() {
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
@@ -92,10 +98,6 @@ function App() {
       console.log("transaction done");
     }
   }
-
-  useEffect(() => {
-    setOracleAddress();
-  }, []);
 
   async function getAtgBalance() {
     if (typeof window.ethereum !== "undefined") {

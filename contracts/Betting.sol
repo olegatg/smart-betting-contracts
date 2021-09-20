@@ -37,6 +37,9 @@ contract Betting {
         emit NewOracleAddressEvent(oracleAddress);
     }
 
+    /*
+     * Called by an oracle service, potentially after a long time?
+     */
     function oracleCallback(uint8 _horseNumber, uint256 _id) public onlyOracle {
         console.log("Oracle callback executed");
         require(myRequests[_id], "This request is not in my pending list.");
@@ -71,7 +74,7 @@ contract Betting {
         Bet memory newBet = Bet(horse, msg.value);
 
         // bet is made. now request correct horse. oracle will call callback.
-        uint256 id = oracleInstance.getCorrectHorse(msg.sender);
+        uint256 id = oracleInstance.getCorrectHorse(msg.sender); // notify "oracle" that someone waits for it.
         myRequests[id] = true;
 
         bets[id] = newBet;
@@ -79,34 +82,15 @@ contract Betting {
     }
 
     /*
+     * User [1] makes a bet
+     * Notify Oracle that user [1] is in a bet.
 
-        if you press directly you get "race not finished"
-        wait 30 sec.
-
-        press the button -> getPayment contract -> race is finished -> how do I get correct horse from node -> pay
-        you get money.
-
-    */
-
-    /*
-    function checkBet() public returns (string memory) {
-        if (bets[msg.sender].horse == correctHorse) {
-            console.log(bets[msg.sender].horse);
-            console.log("Correct horse!");
-            payMeBack(10 * (10**16));
-            return "Money! Correct horse!";
-        }
-        console.log("No money today");
-        return "No money today";
-    }
-    */
-
-    /*
-    function payMeBack(uint256 amountToWithdraw) public returns (bool success) {
-        console.log("AAAA ", msg.sender);
-        payable(msg.sender).transfer(amountToWithdraw);
-        return true;
-    }
+     * time goes on...
+     * users [2], [3] join.
+     *
+     * race starts
+     * race finishes
+     * "oracle service" will for each user trigger a callback
     */
 
     function payMeBack(uint256 amountToWithdraw, address addr)
@@ -117,29 +101,18 @@ contract Betting {
         return true;
     }
 
-    /*
-    function finishRaceAndPay(uint8 horse, uint8 id) public returns (bool) {
-        console.log("Pay back to the following bet:");
-        console.log(horse);
-        console.log(id);
-        console.log(bets[addresses[id]].horse);
-
-        correctHorse = horse;
-
-        if (horse == bets[addresses[id]].horse) {
-            // payable(addresses[id]).transfer(10 * (10**16));
-            // payMeBackWithAddress(10 * (10**16), addresses[id]);
-            return true;
-        }
-        return false;
-    }
-    */
-
     function getATGBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
-    // function payUser () {
-    //     call(userAddress) 100
+    // function checkBet() public returns (string memory) {
+    //     if (bets[msg.sender].horse == correctHorse) {
+    //         console.log(bets[msg.sender].horse);
+    //         console.log("Correct horse!");
+    //         payMeBack(10 * (10**16));
+    //         return "Money! Correct horse!";
+    //     }
+    //     console.log("No money today");
+    //     return "No money today";
     // }
 }

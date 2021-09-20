@@ -3,6 +3,8 @@ const Web3 = require("web3");
 const artifact = require("../src/artifacts/contracts/BettingOracle.sol/BettingOracle.json");
 const contractAddress = require("./bettingOracleAddress.json").address;
 console.log({ contractAddress });
+const bettingContractAddress = require("./bettingAddress.json").address;
+console.log({ bettingContractAddress });
 const networkAddress = "http://localhost:8545";
 const web3 = new Web3(new Web3.providers.HttpProvider(networkAddress));
 console.log(web3.eth.contract);
@@ -17,8 +19,8 @@ const account = (address) => {
       console.log("contractAddress", contractAddress);
       console.log("adr", address);
       if (err === null) {
-        // resolve(accounts[process.env.ACCOUNT_NUMBER]);
-        resolve(address);
+        console.log("will use accounts[0]: ", accounts[0]);
+        resolve(accounts[0]);
       } else {
         reject(err);
       }
@@ -57,13 +59,14 @@ const sendCorrectHorse = (correctHorse, id, address) => {
   return new Promise((resolve, reject) => {
     account(address)
       .then((account) => {
+        console.log("THIS WILL CALL OUR CONTRACT/ORACLE callback");
         contract.sendCorrectHorse(
           correctHorse,
           address,
           id,
           {
-            from: account,
-            gas: 12450000, // max gas.
+            from: bettingContractAddress, // what should this be? should this be user who made the bet?     or is it "oracle owner account?"
+            gas: 12450000, // max gas. // who pays this?
           },
           (err, res) => {
             if (err === null) {
@@ -81,8 +84,9 @@ const sendCorrectHorse = (correctHorse, id, address) => {
 };
 
 /* listener for NewRequest event - oracle service uses it and does staff when receives it */
-const subscribeToGetCorrectHorseEvent = (callback) => {
-  contract.GetCorrectHorseEvent((error, result) => callback(error, result));
+const subscribeToGetCorrectHorseEvent = (listener) => {
+  // contract.forgetEvents
+  contract.GetCorrectHorseEvent((error, result) => listener(error, result));
 };
 
 module.exports = {

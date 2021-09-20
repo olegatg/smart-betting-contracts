@@ -7,23 +7,41 @@ const {
 const bets = [];
 
 const start = () => {
-  subscribeToGetCorrectHorseEvent((error, result) => {
-    console.log("result", result);
-    console.log("start", result?.args);
+  console.log("started. will subscribe to GetCorrectHorseEvent");
+  /*
+   * subscribe and listen to the users requesting results
+   */
+  subscribeToGetCorrectHorseEvent(
+    // function executed at the request:
+    (error, result) => {
+      console.log("LISTENER got GetCorrectHorseEvent! result: ", result);
+      console.log("LISTENER! args: ", result?.args);
 
-    if (!result) {
-      return;
+      if (!result) {
+        return;
+      }
+
+      // implement your log - add request to your log.
+
+      console.log("LISTENER! will push caller to our array");
+
+      // save the incoming bets
+      bets.push({
+        id: result.args.id,
+        callerAddress: result.args.callerAddress,
+      });
+
+      setTimeout(() => {
+        // let's pretend
+        const correctHorse = 9;
+        console.log(
+          "Now race has finished and correct horse is: ",
+          correctHorse
+        );
+        onFinishedRace(correctHorse);
+      }, 5000);
     }
-
-    // save the incoming bets
-    bets.push({ id: result.args.id, callerAddress: result.args.callerAddress });
-
-    setTimeout(() => {
-      const correctHorse = 9;
-      console.log("Now race has finished and correct horse is: ", correctHorse);
-      onFinishedRace(correctHorse);
-    }, 5000);
-  });
+  );
 
   const onFinishedRace = (correctHorse) => {
     // 1. send back correct horse and all bets

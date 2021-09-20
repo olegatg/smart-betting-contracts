@@ -11,6 +11,10 @@ contract BettingOracle {
     event GetCorrectHorseEvent(address callerAddress, uint256 id);
     event SetCorrectHorseEvent(uint256 ethPrice, address callerAddress);
 
+    /*
+     * this function is called after user makes a bet.
+     * it notifies oracle service someone waits for a response by emiting an event
+     */
     function getCorrectHorse(address callerAddress) public returns (uint256) {
         console.log(
             "ORACLE: getCorrectHorse msg.sender: ",
@@ -27,15 +31,18 @@ contract BettingOracle {
             )
         ) % modulus;
         pendingRequests[id] = true;
+        // emit an event to notify external service
         emit GetCorrectHorseEvent(callerAddress, id);
         return id;
     }
 
+    // public onlyOwner {
     function sendCorrectHorse(
         uint8 correctHorse,
         address _callerAddress,
-        uint256 _id //    ) public onlyOwner {
+        uint256 _id
     ) public {
+        console.log("ORACLE: sendCorrectHorse: ", correctHorse);
         require(
             pendingRequests[_id],
             "This request is not in my pending list."
@@ -43,6 +50,7 @@ contract BettingOracle {
         delete pendingRequests[_id];
         CallerContracInterface callerContractInstance;
         callerContractInstance = CallerContracInterface(_callerAddress);
+        // Error: Transaction reverted: function call to a non-contract account
         callerContractInstance.oracleCallback(correctHorse, _id);
         // emit SetCorrectHorseEvent(_ethPrice, _callerAddress);
     }

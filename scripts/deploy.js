@@ -59,6 +59,16 @@ async function main() {
   );
 
   fs.writeFileSync(
+    "./server/bettingAddress.json",
+    JSON.stringify({ address: betting.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  fs.writeFileSync(
     "./src/bettingOracleAddress.json",
     JSON.stringify({ address: bettingOracle.address }),
     function (err) {

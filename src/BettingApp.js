@@ -139,7 +139,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div>
+        <p />
+        <div className="main">
           {" "}
           <button onClick={makeBet}>Make Bet</button>
           <input
@@ -147,18 +148,15 @@ function App() {
             placeholder="Choose Horse nr"
           />
         </div>
-        <div>
-          <button onClick={checkBet}>Check my bet</button>
-        </div>
-        <div>
-          <div>ATG Balance: {atgBalance}</div>
-          <button onClick={getAtgBalance}>Get Atg Balance</button>
-        </div>
-        <div>
-          <button onClick={makeContractRich}>Make contract rich 100eth </button>
-        </div>
-        <div>
-          <button onClick={setOracleAddress}>Set oracle address</button>
+        <div className="admin">
+          <div>Admin</div>
+          <div>
+            <div>ATG Balance: {atgBalance}</div>
+            <button onClick={getAtgBalance}>Get Atg Balance</button>
+          </div>
+          <div>
+            <button onClick={setOracleAddress}>Set oracle address</button>
+          </div>
         </div>
       </header>
     </div>

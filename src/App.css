@@ -1,0 +1,11 @@
+.main {
+  padding-top: 50px;
+  background-color: bisque;
+  height: 100%;
+  padding-bottom: 200px;
+}
+
+.admin {
+  background-color: darkolivegreen;
+  height: 100%;
+}

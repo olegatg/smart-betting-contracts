@@ -27,9 +27,9 @@ const start = () => {
       console.log("LISTENER! will push caller to our array");
       // save the incoming bets
       bets.push({
-        id: result.args.id,
-        callerAddress: result.args.callerAddress,
-          msgSenderAddress: result.args.msgSenderAddress
+          id: result.args.id,
+          playerAddress: result.args.playerAddress,
+          bettingContractAddress: result.args.bettingContractAddress,
       });
 
       setTimeout(() => {
@@ -45,22 +45,14 @@ const start = () => {
   );
 
   const onFinishedRace = (correctHorse) => {
-    // 1. send back correct horse and all bets
-    // sendCorrectHorse(correctHorse, bets);
-
-    /*
-      // alternative
-      forEach(bets, bet => sendCorrectHorse(correctHorse, bet));
-    */
-
     // in real life we would map as in alternative above
     if (bets.length > 0) {
-      console.log("callerAddress: ", bets[bets.length - 1].callerAddress);
+      console.log("returning for player: ", bets[bets.length - 1].playerAddress);
       sendCorrectHorse(
         correctHorse,
         bets[bets.length - 1].id,
-        bets[bets.length - 1].callerAddress,
-        bets[bets.length - 1].msgSenderAddress
+        bets[bets.length - 1].playerAddress,
+        bets[bets.length - 1].bettingContractAddress
       );
     }
   };

@@ -8,7 +8,7 @@ contract BettingOracle {
     uint256 private randNonce = 0;
     uint256 private modulus = 1000;
     mapping(uint256 => bool) pendingRequests;
-    event GetCorrectHorseEvent(
+    event BetPlacedEvent(
         address playerAddress,
         uint256 id,
         address bettingContractAddress
@@ -19,7 +19,7 @@ contract BettingOracle {
      * this function is called after user makes a bet.
      * it notifies oracle service someone waits for a response by emiting an event
      */
-    function getCorrectHorse(address playerAddress) public returns (uint256) {
+    function notifyAtgOnBet(address playerAddress) public returns (uint256) {
         console.log(
             "ORACLE: getCorrectHorse msg.sender: ",
             msg.sender,
@@ -36,7 +36,7 @@ contract BettingOracle {
         ) % modulus;
         pendingRequests[id] = true;
         // emit an event to notify external service
-        emit GetCorrectHorseEvent(playerAddress, id, msg.sender);
+        emit BetPlacedEvent(playerAddress, id, msg.sender);
         return id;
     }
 

@@ -1,19 +1,19 @@
 const {
   sendCorrectHorse,
-  subscribeToGetCorrectHorseEvent,
+  subscribeToBetPlacedEvent,
 } = require("./ethereum.js");
 
 const bets = [];
 
 const start = async () => {
-  console.log("started. will subscribe to GetCorrectHorseEvent");
+  console.log("started. will subscribe to BetPlacedEvent");
   /*
    * subscribe and listen to the users requesting results
    */
-  subscribeToGetCorrectHorseEvent(
+  subscribeToBetPlacedEvent(
     // function executed at the request:
     (error, event) => {
-      console.log("LISTENER got GetCorrectHorseEvent! event: ", {
+      console.log("LISTENER got BetPlacedEvent! event: ", {
         event,
         error,
       });
@@ -32,34 +32,33 @@ const start = async () => {
         bettingContractAddress: event.returnValues.bettingContractAddress,
       });
 
-      setTimeout(() => {
-        // let's pretend
-        const correctHorse = 9;
-        console.log(
-          "Now race has finished and correct horse is: ",
-          correctHorse
-        );
-        onFinishedRace(correctHorse);
-      }, 5000);
+      // setTimeout(() => {
+      //   // let's pretend
+      //   const correctHorse = 9;
+      //   console.log(
+      //     "Now race has finished and correct horse is: ",
+      //     correctHorse
+      //   );
+      //   onFinishedRace(correctHorse);
+      // }, 5000);
     }
   );
 
   const onFinishedRace = async (correctHorse) => {
     // in real life we would map as in alternative above
     if (bets.length > 0) {
-      console.log(
-        "returning for player: ",
-        bets[bets.length - 1].playerAddress
-      );
-      try {
-        await sendCorrectHorse(
-          correctHorse,
-          bets[bets.length - 1].id,
-          bets[bets.length - 1].playerAddress,
-          bets[bets.length - 1].bettingContractAddress
-        );
-      } catch (error) {
-        console.log("ERROR sending: ", error);
+      for (const bet in bets) {
+        console.log("send response to player: ", bet.playerAddress);
+        try {
+          await sendCorrectHorse(
+            correctHorse,
+            bet.id,
+            bet.playerAddress,
+            bet.bettingContractAddress
+          );
+        } catch (error) {
+          console.log("ERROR sending: ", error);
+        }
       }
     }
   };

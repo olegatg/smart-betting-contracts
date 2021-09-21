@@ -85,11 +85,11 @@ const sendCorrectHorse = (
 };
 
 /* listener for NewRequest event - oracle service uses it and does staff when receives it */
-const subscribeToGetCorrectHorseEvent = (listener) => {
-  bettingOracleContract.events.GetCorrectHorseEvent(listener);
+const subscribeToBetPlacedEvent = (listener) => {
+  bettingOracleContract.events.BetPlacedEvent(listener);
 };
 
 module.exports = {
   sendCorrectHorse,
-  subscribeToGetCorrectHorseEvent,
+  subscribeToBetPlacedEvent,
 };

@@ -48,8 +48,10 @@ contract Betting {
         emit ReceivedCorrectHorseEvent(_horseNumber, _id);
 
         if (bets[_id].horse == correctHorse) {
+            // win = getAtgBalance / amountOfBets[correctHorse]
             console.log(bets[_id].horse);
             console.log("Correct horse!");
+            // calculate
             payMeBack(10 * (10**16), addresses[_id]);
             return;
         }
@@ -75,11 +77,14 @@ contract Betting {
         Bet memory newBet = Bet(horse, msg.value);
 
         // bet is made. now request correct horse. oracle will call callback.
-        uint256 id = oracleInstance.getCorrectHorse(msg.sender); // notify "oracle" that someone waits for it.
+        uint256 id = oracleInstance.notifyAtgOnBet(msg.sender); // notify "oracle" that someone waits for it.
         myRequests[id] = true;
 
         bets[id] = newBet;
         addresses[id] = msg.sender;
+
+        // atgBalance
+        // amountOfBets[horse]++;
     }
 
     /*

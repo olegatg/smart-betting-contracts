@@ -12,10 +12,10 @@ contract Betting {
         uint256 amount;
     }
 
-    uint8 private correctHorse;
-    HorseOracleInterface private oracleInstance;
-    address private oracleAddress;
-    mapping(uint256 => bool) myRequests;
+    uint8 public correctHorse;
+    HorseOracleInterface public oracleInstance;
+    address public oracleAddress;
+    mapping(uint256 => bool) public myRequests;
     event NewOracleAddressEvent(address oracleAddress);
     event ReceivedNewRequestIdEvent(uint256 id);
     event ReceivedCorrectHorseEvent(uint256 horseNumber, uint256 id);

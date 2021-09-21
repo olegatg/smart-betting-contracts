@@ -2,7 +2,6 @@ const Web3 = require("web3");
 
 const artifact = require("../src/artifacts/contracts/BettingOracle.sol/BettingOracle.json");
 const oracleContractAddress = require("./bettingOracleAddress.json").address;
-const bettingContractAddress = require("./bettingAddress.json").address;
 const networkAddress = "http://localhost:8545";
 
 // https://intellipaat.com/community/12969/web3-eth-subscribe-not-implemented-for-web3-version-1-0-0-beta-27
@@ -13,9 +12,12 @@ const provider = new Web3.providers.WebsocketProvider(networkAddress);
 const web3 = new Web3(provider);
 
 // get the contract from network
-const contract = new web3.eth.Contract(artifact.abi, oracleContractAddress);
+const bettingOracleContract = new web3.eth.Contract(
+  artifact.abi,
+  oracleContractAddress
+);
 
-console.log("CONTRACT: ", { contract });
+console.log("CONTRACT: ", { bettingOracleContract });
 
 const account = () => {
   return new Promise((resolve, reject) => {
@@ -34,46 +36,38 @@ const account = () => {
 const sendCorrectHorse = (
   correctHorse,
   id,
-  betPlayerAddress,
-  msgSenderAddress
+  playerAddress,
+  bettingContractAddress
 ) => {
-  console.log("send corr horse: ", { correctHorse, id, betPlayerAddress });
+  console.log("send corr horse: ", {
+    correctHorse,
+    id,
+    playerAddress,
+    bettingContractAddress,
+  });
   return new Promise((resolve, reject) => {
-    account(betPlayerAddress)
+    account()
       .then(async (account) => {
-        console.log(
-          "Inside sendCorrectHorse : betPlayerAddress ",
-          betPlayerAddress
-        );
-        console.log(
-          "Inside sendCorrectHorse : msgSenderAddress ",
-          msgSenderAddress
-        );
+        console.log("Call our ORACLE callback");
 
-        console.log("THIS WILL CALL OUR CONTRACT/ORACLE callback");
-
-        const methodToSend = contract.methods.sendCorrectHorse(
+        const methodToSend = bettingOracleContract.methods.sendCorrectHorse(
           correctHorse,
           bettingContractAddress,
           id
         );
 
-        console.log("methodToSend: ", { methodToSend });
-
-        console.log("Will estimate gas");
         const estimatedGas = Math.round(
           (await methodToSend.estimateGas()) * 1.1
         );
 
-        console.log("Inside sendCorrectHorse : account ", {
-          account,
+        console.log("Estimated gas: ", {
           estimatedGas,
         });
 
         methodToSend.send(
           {
-            from: account, // what should this be? should this be user who made the bet?     or is it "oracle owner account?"
-            gas: estimatedGas, // max gas. // who pays this?
+            from: account, // what account does this need to be?
+            gas: estimatedGas, // max gas. payed by the one initiated the bet?
           },
           (err, res) => {
             if (err === null) {
@@ -92,10 +86,7 @@ const sendCorrectHorse = (
 
 /* listener for NewRequest event - oracle service uses it and does staff when receives it */
 const subscribeToGetCorrectHorseEvent = (listener) => {
-  console.log("Subscribe.");
-  contract.events.GetCorrectHorseEvent(null, (error, event) =>
-    listener(error, event)
-  );
+  bettingOracleContract.events.GetCorrectHorseEvent(listener);
 };
 
 module.exports = {

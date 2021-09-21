@@ -28,8 +28,8 @@ const start = async () => {
       // save the incoming bets
       bets.push({
         id: event.returnValues.id,
-        callerAddress: event.returnValues.callerAddress,
-        msgSenderAddress: event.returnValues.msgSenderAddress,
+        playerAddress: event.returnValues.playerAddress,
+        bettingContractAddress: event.returnValues.bettingContractAddress,
       });
 
       setTimeout(() => {
@@ -44,24 +44,19 @@ const start = async () => {
     }
   );
 
-  const onFinishedRace = (correctHorse) => {
-    // 1. send back correct horse and all bets
-    // sendCorrectHorse(correctHorse, bets);
-
-    /*
-      // alternative
-      forEach(bets, bet => sendCorrectHorse(correctHorse, bet));
-    */
-
+  const onFinishedRace = async (correctHorse) => {
     // in real life we would map as in alternative above
     if (bets.length > 0) {
-      console.log("callerAddress: ", bets[bets.length - 1].callerAddress);
+      console.log(
+        "returning for player: ",
+        bets[bets.length - 1].playerAddress
+      );
       try {
-        sendCorrectHorse(
+        await sendCorrectHorse(
           correctHorse,
           bets[bets.length - 1].id,
-          bets[bets.length - 1].callerAddress,
-          bets[bets.length - 1].msgSenderAddress
+          bets[bets.length - 1].playerAddress,
+          bets[bets.length - 1].bettingContractAddress
         );
       } catch (error) {
         console.log("ERROR sending: ", error);

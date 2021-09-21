@@ -4,7 +4,9 @@
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-var fs = require("fs");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -75,6 +77,32 @@ async function main() {
       if (err) {
         console.log(err);
       }
+    }
+  );
+
+  // for atg.se
+
+  // copy address
+  const atgAddressJson =
+    os.homedir() + "/code/atgse/crypto/bettingAddress.json";
+  fs.writeFileSync(
+    atgAddressJson,
+    JSON.stringify({ address: betting.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  const atgArtifactJson = os.homedir() + "/code/atgse/crypto/Betting.json";
+  // copy artifact
+  fs.copyFile(
+    "./src/artifacts/contracts/Betting.sol/Betting.json",
+    atgArtifactJson,
+    (err) => {
+      if (err) throw err;
+      console.log("source.txt was copied to destination.txt");
     }
   );
 }

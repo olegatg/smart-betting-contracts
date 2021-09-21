@@ -80,31 +80,37 @@ async function main() {
     }
   );
 
-  // for atg.se
+  try {
+    // for atg.se
 
-  // copy address
-  const atgAddressJson =
-    os.homedir() + "/code/atgse/crypto/bettingAddress.json";
-  fs.writeFileSync(
-    atgAddressJson,
-    JSON.stringify({ address: betting.address }),
-    function (err) {
-      if (err) {
-        console.log(err);
+    // copy address
+    const atgAddressJson =
+      os.homedir() + "/code/atgse/crypto/bettingAddress.json";
+    fs.writeFileSync(
+      atgAddressJson,
+      JSON.stringify({ address: betting.address }),
+      function (err) {
+        if (err) {
+          console.log(err);
+        }
       }
-    }
-  );
+    );
 
-  const atgArtifactJson = os.homedir() + "/code/atgse/crypto/Betting.json";
-  // copy artifact
-  fs.copyFile(
-    "./src/artifacts/contracts/Betting.sol/Betting.json",
-    atgArtifactJson,
-    (err) => {
-      if (err) throw err;
-      console.log("source.txt was copied to destination.txt");
-    }
-  );
+    const atgArtifactJson = os.homedir() + "/code/atgse/crypto/Betting.json";
+    // copy artifact
+    fs.copyFile(
+      "./src/artifacts/contracts/Betting.sol/Betting.json",
+      atgArtifactJson,
+      (err) => {
+        if (err) throw err;
+        console.log("source.txt was copied to destination.txt");
+      }
+    );
+  } catch (e) {
+    console.log(
+      "could not deploy files to atg.se repo checkout. check your paths in deploy.js script."
+    );
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

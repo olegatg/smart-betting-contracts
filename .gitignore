@@ -29,5 +29,5 @@ cache
 artifacts
 
 #addresses
-/bettingAddress.json
-/bettingOracleAddress.json
+bettingAddress.json
+bettingOracleAddress.json

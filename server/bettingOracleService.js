@@ -1,4 +1,3 @@
-const { checkResultErrors } = require("ethers/lib/utils");
 const {
   sendCorrectHorse,
   subscribeToGetCorrectHorseEvent,

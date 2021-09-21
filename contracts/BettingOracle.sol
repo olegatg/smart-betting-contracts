@@ -43,7 +43,7 @@ contract BettingOracle {
     // public onlyOwner {
     function sendCorrectHorse(
         uint8 correctHorse,
-        address _callerAddress,
+        address _callerContractAddress,
         uint256 _id
     ) public payable {
         console.log("ORACLE FNC: sendCorrectHorse: ", correctHorse);
@@ -53,7 +53,7 @@ contract BettingOracle {
         );
         delete pendingRequests[_id];
         CallerContracInterface callerContractInstance;
-        callerContractInstance = CallerContracInterface(_callerAddress);
+        callerContractInstance = CallerContracInterface(_callerContractAddress);
         // Error: Transaction reverted: function call to a non-contract account
         callerContractInstance.oracleCallback(correctHorse, _id);
         // emit SetCorrectHorseEvent(_ethPrice, _callerAddress);

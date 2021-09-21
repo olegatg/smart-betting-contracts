@@ -7,7 +7,11 @@ import "./HorseOracleInterface.sol";
 // import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Betting {
-    enum BetStatus{NEW,REGISTERED,PAID}
+    enum BetStatus {
+        NEW,
+        REGISTERED,
+        PAID
+    }
     struct Bet {
         uint8 horse;
         uint256 amount;
@@ -22,7 +26,7 @@ contract Betting {
     mapping(uint256 => Bet) public registeredBets;
     mapping(uint8 => uint256) public horseDistribution;
 
-     /*
+    /*
      * need to set this first from the oracle account
      */
     function setOracleInstanceAddress(address _oracleInstanceAddress)
@@ -34,7 +38,7 @@ contract Betting {
     }
 
     function makeBet(uint8 horse) public payable {
-        require(msg.value == 0.05 ether);
+        require(msg.value == 1 ether);
         console.log("Balance: ", msg.sender.balance);
         console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
@@ -50,25 +54,40 @@ contract Betting {
     /*
      * Called by an oracle service, potentially after a long time?
      */
-    function oracleCallback(uint8 _horseNumber, uint256 _id) public onlyOracle {
+    function oracleCallback(uint8 _correctHorseNumber, uint256 _id)
+        public
+        onlyOracle
+    {
         console.log("Oracle callback executed");
-        require(registeredBets[_id].horse > 0, "This request is not in my pending list ");
-        require(registeredBets[_id].status !=  BetStatus.PAID, "This request is already paid out");
-        correctHorse = _horseNumber;
-        delete registeredBets[_id];
+        require(
+            registeredBets[_id].horse > 0,
+            "This request is not in my pending list "
+        );
+        require(
+            registeredBets[_id].status != BetStatus.PAID,
+            "This request is already paid out"
+        );
+        correctHorse = _correctHorseNumber;
 
-        if (registeredBets[_id].horse == correctHorse) {
-            console.log(registeredBets[_id].playerAddress);
+        registeredBets[_id].status = BetStatus.PAID; // just to not pay again.
+        if (registeredBets[_id].horse == _correctHorseNumber) {
             console.log("Correct horse!", registeredBets[_id].horse);
             // calculate
-            payMeBack(address(this).balance/horseDistribution[correctHorse], registeredBets[_id].playerAddress);
-            return;
+            payMeBack(
+                address(this).balance / horseDistribution[_correctHorseNumber],
+                registeredBets[_id].playerAddress
+            );
+        } else {
+            console.log("No money today");
         }
-        console.log("No money today");
     }
 
-    function payMeBack(uint256 amountToWithdraw, address addr) public returns (bool success)
+    function payMeBack(uint256 amountToWithdraw, address addr)
+        public
+        returns (bool success)
     {
+        console.log("Pay back to ", addr);
+        console.log("Will pay ", amountToWithdraw);
         payable(addr).transfer(amountToWithdraw);
         return true;
     }

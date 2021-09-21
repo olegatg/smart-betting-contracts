@@ -48,6 +48,10 @@ function App() {
     }
   }
 
+  async function finishRace() {
+    fetch("http://localhost:3001/finishRace");
+  }
+
   // call the smart contract, send an update
   async function makeBet() {
     if (!bettingValue) return;
@@ -68,7 +72,7 @@ function App() {
       console.log("got contract: ", { contract });
 
       const transaction = await contract.makeBet(bettingValue, {
-        value: ethers.utils.parseEther("0.05"),
+        value: ethers.utils.parseEther("1"),
       });
       console.log("await for transaction ", { transaction });
       await transaction.wait();
@@ -118,24 +122,6 @@ function App() {
     }
   }
 
-  async function makeContractRich() {
-    if (typeof window.ethereum !== "undefined") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      // could suffice to use provider, but then one gets a diferent adress in setBetting
-      // so we can use signer in both places or come up with a different id mechanism (probably bet id or so)
-      const contract = new ethers.Contract(
-        bettingContractAddress,
-        Betting.abi,
-        signer
-      );
-
-      const data = await contract.makeContractRich({
-        value: ethers.utils.parseEther("100"),
-      });
-    }
-  }
-
   return (
     <div className="App">
       <header className="App-header">
@@ -156,6 +142,9 @@ function App() {
           </div>
           <div>
             <button onClick={setOracleAddress}>Set oracle address</button>
+          </div>
+          <div>
+            <button onClick={finishRace}>Finish race</button>
           </div>
         </div>
       </header>

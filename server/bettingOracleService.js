@@ -31,37 +31,32 @@ const start = async () => {
         playerAddress: event.returnValues.playerAddress,
         bettingContractAddress: event.returnValues.bettingContractAddress,
       });
-
-      // setTimeout(() => {
-      //   // let's pretend
-      //   const correctHorse = 9;
-      //   console.log(
-      //     "Now race has finished and correct horse is: ",
-      //     correctHorse
-      //   );
-      //   onFinishedRace(correctHorse);
-      // }, 5000);
     }
   );
-
-  const onFinishedRace = async (correctHorse) => {
-    // in real life we would map as in alternative above
-    if (bets.length > 0) {
-      for (const bet in bets) {
-        console.log("send response to player: ", bet.playerAddress);
-        try {
-          await sendCorrectHorse(
-            correctHorse,
-            bet.id,
-            bet.playerAddress,
-            bet.bettingContractAddress
-          );
-        } catch (error) {
-          console.log("ERROR sending: ", error);
-        }
-      }
-    }
-  };
 };
 
-module.exports = start;
+const finishRace = (correctHorse) => {
+  // in real life we would map as in alternative above
+  if (bets?.length > 0) {
+    bets.forEach(async (bet) => {
+      console.log("send response to player: ", bet.playerAddress);
+      try {
+        await sendCorrectHorse(
+          correctHorse,
+          bet.id,
+          bet.playerAddress,
+          bet.bettingContractAddress
+        );
+      } catch (error) {
+        console.log("ERROR sending: ", error);
+      }
+    });
+  } else {
+    console.log("no bets...");
+  }
+};
+
+module.exports = {
+  start,
+  finishRace,
+};

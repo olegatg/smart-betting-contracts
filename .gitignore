@@ -27,3 +27,7 @@ node_modules
 #Hardhat files
 cache
 artifacts
+
+#addresses
+bettingAddress.json
+bettingOracleAddress.json

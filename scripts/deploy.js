@@ -4,7 +4,9 @@
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-var fs = require("fs");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -12,15 +14,9 @@ async function main() {
   //
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
-  // await hre.run('compile');
+  await hre.run("compile");
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
 
   const Betting = await hre.ethers.getContractFactory("Betting");
   const betting = await Betting.deploy();
@@ -33,7 +29,7 @@ async function main() {
   );
 
   fs.writeFileSync(
-    "./src/betting.json",
+    "./src/bettingAddress.json",
     JSON.stringify({ address: betting.address }),
     function (err) {
       if (err) {
@@ -41,6 +37,80 @@ async function main() {
       }
     }
   );
+
+  const BettingOracleFactory = await hre.ethers.getContractFactory(
+    "BettingOracle"
+  );
+  const bettingOracle = await BettingOracleFactory.deploy();
+
+  await bettingOracle.deployed();
+
+  console.log(
+    "Betting oracle deployed to:",
+    JSON.stringify({ address: bettingOracle.address })
+  );
+
+  fs.writeFileSync(
+    "./server/bettingOracleAddress.json",
+    JSON.stringify({ address: bettingOracle.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  fs.writeFileSync(
+    "./server/bettingAddress.json",
+    JSON.stringify({ address: betting.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  fs.writeFileSync(
+    "./src/bettingOracleAddress.json",
+    JSON.stringify({ address: bettingOracle.address }),
+    function (err) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  try {
+    // for atg.se
+
+    // copy address
+    const atgAddressJson =
+      os.homedir() + "/code/atgse/crypto/bettingAddress.json";
+    fs.writeFileSync(
+      atgAddressJson,
+      JSON.stringify({ address: betting.address }),
+      function (err) {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
+    const atgArtifactJson = os.homedir() + "/code/atgse/crypto/Betting.json";
+    // copy artifact
+    fs.copyFile(
+      "./src/artifacts/contracts/Betting.sol/Betting.json",
+      atgArtifactJson,
+      (err) => {
+        if (err) throw err;
+        console.log("source.txt was copied to destination.txt");
+      }
+    );
+  } catch (e) {
+    console.log(
+      "could not deploy files to atg.se repo checkout. check your paths in deploy.js script."
+    );
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

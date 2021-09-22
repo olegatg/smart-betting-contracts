@@ -126,24 +126,28 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p />
-        <div className="main">
-          {" "}
-          <button onClick={makeBet}>Make Bet</button>
-          <input
-            onChange={(e) => setBettingValue(e.target.value)}
-            placeholder="Choose Horse nr"
-          />
-        </div>
+
         <div className="admin">
           <div>Admin</div>
           <div>
-            <div>ATG Balance: {atgBalance}</div>
-            <button onClick={getAtgBalance}>Get Atg Balance</button>
+            <button onClick={getAtgBalance}>Get Status</button>
+            <div>Pool balance: {atgBalance}</div>
           </div>
           <div>
             <button onClick={setOracleAddress}>Set oracle address</button>
           </div>
+        </div>
+        <div className="bet">
           <div>
+            {"(Here or on ATG site)"}
+            <button onClick={makeBet}>Make Bet</button>
+            <input
+              onChange={(e) => setBettingValue(e.target.value)}
+              placeholder="Choose Horse nr"
+            />
+          </div>
+          <div>
+            {"(Here or on NFT site)"}
             <button onClick={finishRace}>Finish race</button>
           </div>
         </div>

@@ -1,11 +1,15 @@
-.main {
-  padding-top: 50px;
+.bet {
+  padding-top: 500px;
   background-color: bisque;
   height: 100%;
   padding-bottom: 200px;
 }
 
 .admin {
-  background-color: darkolivegreen;
+  background-color: bisque;
   height: 100%;
+}
+
+div {
+  padding: 10px;
 }

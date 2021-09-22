@@ -18,6 +18,10 @@ function App() {
   const [bettingValue, setBettingValue] = useState();
   const [atgBalance, setAtgBalance] = useState();
   const [poolBalance, setPoolBalance] = useState();
+  const [player1Balance, setPlayer1Balance] = useState();
+  const [player2Balance, setPlayer2Balance] = useState();
+  const [player3Balance, setPlayer3Balance] = useState();
+  const [player4Balance, setPlayer4Balance] = useState();
 
   // request access to the user's MetaMask account
   async function requestAccount() {
@@ -142,9 +146,19 @@ function App() {
       setAtgBalance(convertHex(data) / 1000000000000000000);
 
       const poolData = await contract.getPoolBalance();
-      console.log("atg balance: ", { poolData });
-      console.log("atg balance converted: ", convertHex(poolData));
       setPoolBalance(convertHex(poolData) / 1000000000000000000);
+
+      const player1 = await contract.getPlayer1Balance();
+      setPlayer1Balance(convertHex(player1) / 1000000000000000000);
+
+      const player2 = await contract.getPlayer2Balance();
+      setPlayer2Balance(convertHex(player2) / 1000000000000000000);
+
+      const player3 = await contract.getPlayer3Balance();
+      setPlayer3Balance(convertHex(player3) / 1000000000000000000);
+
+      const player4 = await contract.getPlayer4Balance();
+      setPlayer4Balance(convertHex(player4) / 1000000000000000000);
     }
   }
 
@@ -162,6 +176,11 @@ function App() {
             <button onClick={getStatus}>Get Status</button>
             <div>Pool balance: {poolBalance}</div>
             <div>Atg balance: {atgBalance}</div>
+            <div />
+            <div>Player1 balance: {player1Balance}</div>
+            <div>Player2 balance: {player2Balance}</div>
+            <div>Player3 balance: {player3Balance}</div>
+            <div>Player4 balance: {player4Balance}</div>
           </div>
 
           <div>

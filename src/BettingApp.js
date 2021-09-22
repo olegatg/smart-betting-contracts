@@ -17,6 +17,11 @@ function App() {
   // store betting in local state
   const [bettingValue, setBettingValue] = useState();
   const [atgBalance, setAtgBalance] = useState();
+  const [poolBalance, setPoolBalance] = useState();
+  const [player1Balance, setPlayer1Balance] = useState();
+  const [player2Balance, setPlayer2Balance] = useState();
+  const [player3Balance, setPlayer3Balance] = useState();
+  const [player4Balance, setPlayer4Balance] = useState();
 
   // request access to the user's MetaMask account
   async function requestAccount() {
@@ -49,7 +54,7 @@ function App() {
   }
 
   async function finishRace() {
-    fetch("http://localhost:3001/finishRace");
+    fetch("http://localhost:3001/finishRace?winner=1");
   }
 
   // call the smart contract, send an update
@@ -103,7 +108,27 @@ function App() {
     }
   }
 
-  async function getAtgBalance() {
+  async function resetBets() {
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log("provider in set: ", { provider });
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
+
+      console.log("will reset bets ");
+      const oracleInstanceTransaction = await contract.resetBets();
+      await oracleInstanceTransaction.wait();
+
+      console.log("transaction done");
+    }
+  }
+
+  async function getStatus() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -118,7 +143,22 @@ function App() {
       const data = await contract.getATGBalance();
       console.log("atg balance: ", { data });
       console.log("atg balance converted: ", convertHex(data));
-      setAtgBalance(convertHex(data));
+      setAtgBalance(convertHex(data) / 1000000000000000000);
+
+      const poolData = await contract.getPoolBalance();
+      setPoolBalance(convertHex(poolData) / 1000000000000000000);
+
+      const player1 = await contract.getPlayer1Balance();
+      setPlayer1Balance(convertHex(player1) / 1000000000000000000);
+
+      const player2 = await contract.getPlayer2Balance();
+      setPlayer2Balance(convertHex(player2) / 1000000000000000000);
+
+      const player3 = await contract.getPlayer3Balance();
+      setPlayer3Balance(convertHex(player3) / 1000000000000000000);
+
+      const player4 = await contract.getPlayer4Balance();
+      setPlayer4Balance(convertHex(player4) / 1000000000000000000);
     }
   }
 
@@ -126,24 +166,38 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p />
-        <div className="main">
-          {" "}
-          <button onClick={makeBet}>Make Bet</button>
-          <input
-            onChange={(e) => setBettingValue(e.target.value)}
-            placeholder="Choose Horse nr"
-          />
-        </div>
+
         <div className="admin">
           <div>Admin</div>
-          <div>
-            <div>ATG Balance: {atgBalance}</div>
-            <button onClick={getAtgBalance}>Get Atg Balance</button>
-          </div>
           <div>
             <button onClick={setOracleAddress}>Set oracle address</button>
           </div>
           <div>
+            <button onClick={getStatus}>Get Status</button>
+            <div>Pool balance: {poolBalance}</div>
+            <div>Atg balance: {atgBalance}</div>
+            <div />
+            <div>Player1 balance: {player1Balance}</div>
+            <div>Player2 balance: {player2Balance}</div>
+            <div>Player3 balance: {player3Balance}</div>
+            <div>Player4 balance: {player4Balance}</div>
+          </div>
+
+          <div>
+            <button onClick={resetBets}>Reset bets</button>
+          </div>
+        </div>
+        <div className="bet">
+          <div>
+            {"(Here or on ATG site)"}
+            <button onClick={makeBet}>Make Bet</button>
+            <input
+              onChange={(e) => setBettingValue(e.target.value)}
+              placeholder="Choose Horse nr"
+            />
+          </div>
+          <div>
+            {"(Here or on NFT site)"}
             <button onClick={finishRace}>Finish race</button>
           </div>
         </div>

@@ -26,6 +26,13 @@ contract Betting {
     mapping(uint256 => Bet) public registeredBets;
     mapping(uint8 => uint256) public horseDistribution;
 
+    address atgAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+
+    address player1 = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+    address player2 = 0xdD2FD4581271e230360230F9337D5c0430Bf44C0;
+    address player3 = 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199;
+    address player4 = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
+
     /*
      * need to set this first from the oracle account
      */
@@ -43,12 +50,39 @@ contract Betting {
         console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
 
+        // take a share for atg.
+        payable(atgAccount).transfer(0.3 ether);
+
         Bet memory newBet = Bet(horse, msg.value, msg.sender, BetStatus.NEW);
 
         // bet is made. now request correct horse. oracle will call callback.
         uint256 id = oracleInstance.notifyAtgOnBet(msg.sender); // notify "oracle" that someone waits for it.
         registeredBets[id] = newBet;
         horseDistribution[horse]++;
+    }
+
+    function resetBets() public {
+        console.log("will reset the bets.");
+
+        // reset bets in atg server
+        oracleInstance.resetBets();
+
+        horseDistribution[1] = 0;
+        horseDistribution[2] = 0;
+        horseDistribution[3] = 0;
+        horseDistribution[4] = 0;
+        horseDistribution[5] = 0;
+        horseDistribution[6] = 0;
+        horseDistribution[7] = 0;
+        horseDistribution[8] = 0;
+        horseDistribution[9] = 0;
+        horseDistribution[10] = 0;
+        horseDistribution[11] = 0;
+        horseDistribution[12] = 0;
+        horseDistribution[13] = 0;
+        horseDistribution[14] = 0;
+        horseDistribution[15] = 0;
+        horseDistribution[16] = 0;
     }
 
     /*
@@ -93,7 +127,29 @@ contract Betting {
     }
 
     function getATGBalance() public view returns (uint256) {
-        return address(this).balance;
+        return address(atgAccount).balance;
+    }
+
+    function getPoolBalance() public view returns (uint256) {
+        uint256 balance = address(this).balance;
+        console.log("Pool balance: ", balance);
+        return balance;
+    }
+
+    function getPlayer1Balance() public view returns (uint256) {
+        return address(player1).balance;
+    }
+
+    function getPlayer2Balance() public view returns (uint256) {
+        return address(player2).balance;
+    }
+
+    function getPlayer3Balance() public view returns (uint256) {
+        return address(player3).balance;
+    }
+
+    function getPlayer4Balance() public view returns (uint256) {
+        return address(player4).balance;
     }
 
     modifier onlyOracle() {

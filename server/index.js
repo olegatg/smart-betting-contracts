@@ -11,8 +11,8 @@ const bettingOracleService = require("./bettingOracleService");
 bettingOracleService.start();
 
 app.get("/finishRace", (req, res) => {
-  console.log("Received finishRace request");
-  const correctHorse = 9;
+  console.log("Received finishRace request ", req.query.winner);
+  const correctHorse = req.query.winner;
   bettingOracleService.finishRace(correctHorse);
   res.status(200).send("race finished. correct horse: ");
 });

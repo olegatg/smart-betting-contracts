@@ -12,7 +12,7 @@
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.3.1",
     "express": "^4.17.1",
-    "hardhat": "^2.3.3",
+    "hardhat": "^2.6.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -22,11 +22,12 @@
   },
   "proxy": "http://localhost:3001",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start-server": "nodemon ./server/index.js"
+    "start-server": "nodemon ./server/index.js",
+    "hardhat-deploy": "hardhat run --network localhost scripts/deploy.js"
   },
   "eslintConfig": {
     "extends": [

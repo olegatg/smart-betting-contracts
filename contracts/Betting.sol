@@ -131,7 +131,9 @@ contract Betting {
     }
 
     function getPoolBalance() public view returns (uint256) {
-        return address(this).balance;
+        uint256 balance = address(this).balance;
+        console.log("Pool balance: ", balance);
+        return balance;
     }
 
     function getPlayer1Balance() public view returns (uint256) {

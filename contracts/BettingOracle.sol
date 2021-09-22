@@ -5,8 +5,7 @@ import "hardhat/console.sol";
 
 // contract BettingOracle is Ownable {
 contract BettingOracle {
-    uint256 private randNonce = 0;
-    uint256 private modulus = 1000;
+    uint256 private idCounter = 1;
     mapping(uint256 => bool) pendingRequests;
     event BetPlacedEvent(
         address playerAddress,
@@ -27,14 +26,9 @@ contract BettingOracle {
             playerAddress
         );
 
-        // in original example (https://cryptozombies.io/en/lesson/15/chapter/1) they used msg.sender, but it seems not to work
+        idCounter++;
+        uint256 id = idCounter;
 
-        randNonce++;
-        uint256 id = uint256(
-            keccak256(
-                abi.encodePacked(block.timestamp, playerAddress, randNonce)
-            )
-        ) % modulus;
         pendingRequests[id] = true;
         // emit an event to notify external service
         emit BetPlacedEvent(playerAddress, id, msg.sender);

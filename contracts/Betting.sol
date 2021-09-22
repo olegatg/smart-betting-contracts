@@ -26,6 +26,8 @@ contract Betting {
     mapping(uint256 => Bet) public registeredBets;
     mapping(uint8 => uint256) public horseDistribution;
 
+    address atgAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+
     /*
      * need to set this first from the oracle account
      */
@@ -43,12 +45,39 @@ contract Betting {
         console.log("Horse: ", horse);
         console.log("msg sender and value: ", msg.sender, msg.value);
 
+        // take a share for atg.
+        payable(atgAccount).transfer(0.3 ether);
+
         Bet memory newBet = Bet(horse, msg.value, msg.sender, BetStatus.NEW);
 
         // bet is made. now request correct horse. oracle will call callback.
         uint256 id = oracleInstance.notifyAtgOnBet(msg.sender); // notify "oracle" that someone waits for it.
         registeredBets[id] = newBet;
         horseDistribution[horse]++;
+    }
+
+    function resetBets() public {
+        console.log("will reset the bets.");
+
+        // reset bets in atg server
+        oracleInstance.resetBets();
+
+        horseDistribution[1] = 0;
+        horseDistribution[2] = 0;
+        horseDistribution[3] = 0;
+        horseDistribution[4] = 0;
+        horseDistribution[5] = 0;
+        horseDistribution[6] = 0;
+        horseDistribution[7] = 0;
+        horseDistribution[8] = 0;
+        horseDistribution[9] = 0;
+        horseDistribution[10] = 0;
+        horseDistribution[11] = 0;
+        horseDistribution[12] = 0;
+        horseDistribution[13] = 0;
+        horseDistribution[14] = 0;
+        horseDistribution[15] = 0;
+        horseDistribution[16] = 0;
     }
 
     /*
@@ -93,6 +122,10 @@ contract Betting {
     }
 
     function getATGBalance() public view returns (uint256) {
+        return address(atgAccount).balance;
+    }
+
+    function getPoolBalance() public view returns (uint256) {
         return address(this).balance;
     }
 

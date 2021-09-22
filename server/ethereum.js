@@ -84,12 +84,18 @@ const sendCorrectHorse = (
   });
 };
 
-/* listener for NewRequest event - oracle service uses it and does staff when receives it */
+/* listener for BetPlacedEvent event - oracle service uses it and does staff when receives it */
 const subscribeToBetPlacedEvent = (listener) => {
   bettingOracleContract.events.BetPlacedEvent(listener);
+};
+
+/* listener for ResetBetsEvent event*/
+const subscribeToResetBetsEvent = (listener) => {
+  bettingOracleContract.events.ResetBetsEvent(listener);
 };
 
 module.exports = {
   sendCorrectHorse,
   subscribeToBetPlacedEvent,
+  subscribeToResetBetsEvent,
 };

@@ -14,13 +14,18 @@ contract BettingOracle {
         address bettingContractAddress
     );
     event SetCorrectHorseEvent(uint256 ethPrice, address callerAddress);
+    event ResetBetsEvent();
 
     /*
      * this function is called after user makes a bet.
      * it notifies oracle service someone waits for a response by emiting an event
      */
     function notifyAtgOnBet(address playerAddress) public returns (uint256) {
-        console.log( "ORACLE: getCorrectHorse msg.sender: ", msg.sender,playerAddress);
+        console.log(
+            "ORACLE: getCorrectHorse msg.sender: ",
+            msg.sender,
+            playerAddress
+        );
 
         // in original example (https://cryptozombies.io/en/lesson/15/chapter/1) they used msg.sender, but it seems not to work
 
@@ -36,6 +41,10 @@ contract BettingOracle {
         return id;
     }
 
+    function resetBets() public {
+        emit ResetBetsEvent();
+    }
+
     // public onlyOwner {
     function sendCorrectHorse(
         uint8 correctHorse,
@@ -43,9 +52,15 @@ contract BettingOracle {
         uint256 _id
     ) public payable {
         console.log("ORACLE: sendCorrectHorse: ", correctHorse);
-        require(pendingRequests[_id],"This request is not in my pending list.");
+        require(
+            pendingRequests[_id],
+            "This request is not in my pending list."
+        );
         delete pendingRequests[_id];
-        console.log("ORACLE: sendCorrectHorse: calling _bettingContractAddress",_bettingContractAddress);
+        console.log(
+            "ORACLE: sendCorrectHorse: calling _bettingContractAddress",
+            _bettingContractAddress
+        );
         CallerContracInterface callerContractInstance;
         callerContractInstance = CallerContracInterface(
             _bettingContractAddress

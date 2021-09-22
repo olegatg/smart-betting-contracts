@@ -17,6 +17,7 @@ function App() {
   // store betting in local state
   const [bettingValue, setBettingValue] = useState();
   const [atgBalance, setAtgBalance] = useState();
+  const [poolBalance, setPoolBalance] = useState();
 
   // request access to the user's MetaMask account
   async function requestAccount() {
@@ -49,7 +50,7 @@ function App() {
   }
 
   async function finishRace() {
-    fetch("http://localhost:3001/finishRace");
+    fetch("http://localhost:3001/finishRace?winner=1");
   }
 
   // call the smart contract, send an update
@@ -103,7 +104,27 @@ function App() {
     }
   }
 
-  async function getAtgBalance() {
+  async function resetBets() {
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log("provider in set: ", { provider });
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        bettingContractAddress,
+        Betting.abi,
+        signer
+      );
+
+      console.log("will reset bets ");
+      const oracleInstanceTransaction = await contract.resetBets();
+      await oracleInstanceTransaction.wait();
+
+      console.log("transaction done");
+    }
+  }
+
+  async function getStatus() {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -118,7 +139,12 @@ function App() {
       const data = await contract.getATGBalance();
       console.log("atg balance: ", { data });
       console.log("atg balance converted: ", convertHex(data));
-      setAtgBalance(convertHex(data));
+      setAtgBalance(convertHex(data) / 1000000000000000000);
+
+      const poolData = await contract.getPoolBalance();
+      console.log("atg balance: ", { poolData });
+      console.log("atg balance converted: ", convertHex(poolData));
+      setPoolBalance(convertHex(poolData) / 1000000000000000000);
     }
   }
 
@@ -130,11 +156,16 @@ function App() {
         <div className="admin">
           <div>Admin</div>
           <div>
-            <button onClick={getAtgBalance}>Get Status</button>
-            <div>Pool balance: {atgBalance}</div>
+            <button onClick={setOracleAddress}>Set oracle address</button>
           </div>
           <div>
-            <button onClick={setOracleAddress}>Set oracle address</button>
+            <button onClick={getStatus}>Get Status</button>
+            <div>Pool balance: {poolBalance}</div>
+            <div>Atg balance: {atgBalance}</div>
+          </div>
+
+          <div>
+            <button onClick={resetBets}>Reset bets</button>
           </div>
         </div>
         <div className="bet">

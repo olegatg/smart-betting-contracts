@@ -5,4 +5,6 @@ abstract contract HorseOracleInterface {
         public
         virtual
         returns (uint256);
+
+    function resetBets() public virtual;
 }
